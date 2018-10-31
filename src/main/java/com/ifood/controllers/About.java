@@ -18,6 +18,6 @@ public class About {
     @RequestMapping(method= RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<GenericResponseVO> about() {
-        return new ResponseEntity<>(new GenericResponseVO(HttpStatus.OK.value(), "Servidor esta rodando"), HttpStatus.OK);
+        return new ResponseEntity<>(new GenericResponseVO(HttpStatus.OK.value(), "Server is UP"), HttpStatus.OK);
     }
 }

@@ -44,6 +44,11 @@ public class OpenWeatherMapWeatherServiceImpl implements WeatherService {
                     createDefaultHttpEntity(),
                     WeatherVO.class);
 
+            if (response == null) {
+                logger.info("I=Cidade nao encontrada, city={}", city);
+                throw new WeatherCityNotFoundException("Cidade não encontrada");
+            }
+
             WeatherVO weatherResponse = response.getBody();
 
             logger.info("I=Clima da cidade encontrado, city={}, weather={}", city, weatherResponse);
