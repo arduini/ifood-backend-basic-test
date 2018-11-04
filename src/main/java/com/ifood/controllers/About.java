@@ -1,7 +1,6 @@
 package com.ifood.controllers;
 
 import com.ifood.vos.GenericResponseVO;
-import com.ifood.vos.WeatherResponseVO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

@@ -2,7 +2,7 @@ package com.ifood.services;
 
 import com.ifood.exceptions.WeatherCityNotFoundException;
 import com.ifood.services.impl.OpenWeatherMapWeatherServiceImpl;
-import com.ifood.vos.WeatherVO;
+import com.ifood.vos.OpenWeatherMapWeatherVO;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,60 +38,60 @@ public class OpenWeatherMapWeatherServiceTest {
     @Test
     public void getWeatherSuccess() {
 
-        WeatherVO response = new WeatherVO();
+        OpenWeatherMapWeatherVO response = new OpenWeatherMapWeatherVO();
         response.setId(1L);
         response.setName("Teste");
-        ResponseEntity<WeatherVO> responseEntity = new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+        ResponseEntity<OpenWeatherMapWeatherVO> responseEntity = new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(WeatherVO.class)))
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class)))
                 .thenReturn(responseEntity);
 
         weatherService.getWeather("city");
 
-        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(WeatherVO.class));
+        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class));
     }
 
     @Test(expected = WeatherCityNotFoundException.class)
     public void getWeatherNullResponse() {
 
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(WeatherVO.class)))
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class)))
                 .thenReturn(null);
 
         weatherService.getWeather("city");
 
-        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(WeatherVO.class));
+        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class));
     }
 
     @Test(expected = WeatherCityNotFoundException.class)
     public void getWeatherCityNotFound() {
 
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(WeatherVO.class)))
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         weatherService.getWeather("city");
 
-        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(WeatherVO.class));
+        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class));
     }
 
     @Test(expected = HttpClientErrorException.class)
     public void getWeatherGenericHttpClientErrorException() {
 
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(WeatherVO.class)))
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
         weatherService.getWeather("city");
 
-        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(WeatherVO.class));
+        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class));
     }
 
     @Test(expected = Exception.class)
     public void getWeatherGenericException() {
 
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(WeatherVO.class)))
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class)))
                 .thenThrow(new RuntimeException());
 
         weatherService.getWeather("city");
 
-        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(WeatherVO.class));
+        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class));
     }
 }

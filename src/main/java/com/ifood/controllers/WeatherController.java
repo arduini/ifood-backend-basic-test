@@ -3,11 +3,12 @@ package com.ifood.controllers;
 import com.ifood.exceptions.WeatherCityNotFoundException;
 import com.ifood.services.WeatherService;
 import com.ifood.vos.GenericResponseVO;
-import com.ifood.vos.WeatherResponseVO;
 import com.ifood.vos.WeatherVO;
+import com.ifood.vos.OpenWeatherMapWeatherVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,7 @@ public class WeatherController {
     private final Logger logger = LoggerFactory.getLogger(WeatherController.class);
 
     @Autowired
+    @Qualifier("OpenWeatherMapWeather")
     private WeatherService weatherService;
 
     @RequestMapping(method= RequestMethod.GET)
@@ -33,16 +35,23 @@ public class WeatherController {
 
         try {
             WeatherVO weather = weatherService.getWeather(city);
-            WeatherResponseVO weatherResp = new WeatherResponseVO(weather);
 
-            return new ResponseEntity<>(new GenericResponseVO(HttpStatus.OK.value(), weatherResp), HttpStatus.OK);
+            if (weather == null) {
+                logger.warn("W=Problemas ao pesquisar clima da cidade, city={}", city);
+                return new ResponseEntity<>(new GenericResponseVO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Sorry, an error occurred. Please, try again later!"), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            logger.info("I=Pesquisa de clima por cidade realizado com sucesso, city={}, weatherResp={}", city, weather);
+            return new ResponseEntity<>(new GenericResponseVO(HttpStatus.OK.value(), weather), HttpStatus.OK);
         }
         catch (WeatherCityNotFoundException e) {
 
+            logger.info("I=Cidade nao encontrada, city={}", city);
             return new ResponseEntity<>(new GenericResponseVO(HttpStatus.NOT_FOUND.value(), e.getMessage()), HttpStatus.NOT_FOUND);
         }
         catch (Exception e) {
 
+            logger.error("I=Erro ao pesquisar clima da cidade, city={}", city, e);
             return new ResponseEntity<>(new GenericResponseVO(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

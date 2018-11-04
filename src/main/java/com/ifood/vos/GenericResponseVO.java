@@ -14,14 +14,14 @@ public class GenericResponseVO implements Serializable {
     private Integer StatusCode;
     private String message;
 
-    private WeatherResponseVO weather;
+    private WeatherVO weather;
 
     public GenericResponseVO(Integer statusCode, String message) {
         this.StatusCode = statusCode;
         this.message = message;
     }
 
-    public GenericResponseVO(Integer statusCode, WeatherResponseVO weather) {
+    public GenericResponseVO(Integer statusCode, WeatherVO weather) {
         this.StatusCode = statusCode;
         this.weather = weather;
     }
@@ -42,11 +42,11 @@ public class GenericResponseVO implements Serializable {
         this.message = message;
     }
 
-    public WeatherResponseVO getWeather() {
+    public WeatherVO getWeather() {
         return weather;
     }
 
-    public void setWeather(WeatherResponseVO weather) {
+    public void setWeather(WeatherVO weather) {
         this.weather = weather;
     }
 
