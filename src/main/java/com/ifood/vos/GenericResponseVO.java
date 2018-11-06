@@ -13,7 +13,6 @@ public class GenericResponseVO implements Serializable {
 
     private Integer StatusCode;
     private String message;
-
     private WeatherVO weather;
 
     public GenericResponseVO(Integer statusCode, String message) {

@@ -6,11 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Date;
-
-import static com.ifood.utils.ConversionsUtil.convertKelvinToCelsius;
-import static com.ifood.utils.ConversionsUtil.convertSecondsToDate;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -30,40 +26,7 @@ public class WeatherVO implements Serializable {
     private Date sunrise;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone="GMT-3")
     private Date sunset;
-
-    public WeatherVO() {
-    }
-
-    public WeatherVO(OpenWeatherMapWeatherVO weatherResp) {
-
-        if(weatherResp == null) {
-
-            return;
-        }
-
-        this.cityId = weatherResp.getId();
-        this.cityName = weatherResp.getName();
-
-        if (weatherResp.getWeather() != null && weatherResp.getWeather().size() > 0) {
-
-            this.main = weatherResp.getWeather().get(0).getMain();
-            this.description = weatherResp.getWeather().get(0).getDescription();
-        }
-
-        if (weatherResp.getMain() != null) {
-
-            this.temperature = convertKelvinToCelsius(weatherResp.getMain().getTemp()).setScale(2, RoundingMode.FLOOR);
-            this.maxTemp = convertKelvinToCelsius(weatherResp.getMain().getTempMax()).setScale(2, RoundingMode.FLOOR);
-            this.minTemp = convertKelvinToCelsius(weatherResp.getMain().getTempMin()).setScale(2, RoundingMode.FLOOR);
-            this.humidity = weatherResp.getMain().getHumidity();
-        }
-
-        if (weatherResp.getSys() != null) {
-
-            this.sunrise = convertSecondsToDate(weatherResp.getSys().getSunrise());
-            this.sunset = convertSecondsToDate(weatherResp.getSys().getSunset());
-        }
-    }
+    private String source;
 
     public Long getCityId() {
         return cityId;
@@ -145,9 +108,17 @@ public class WeatherVO implements Serializable {
         this.sunset = sunset;
     }
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("WeatherResponseVO{");
+        final StringBuffer sb = new StringBuffer("WeatherVO{");
         sb.append("cityId=").append(cityId);
         sb.append(", cityName='").append(cityName).append('\'');
         sb.append(", main='").append(main).append('\'');
@@ -158,6 +129,7 @@ public class WeatherVO implements Serializable {
         sb.append(", humidity=").append(humidity);
         sb.append(", sunrise=").append(sunrise);
         sb.append(", sunset=").append(sunset);
+        sb.append(", source='").append(source).append('\'');
         sb.append('}');
         return sb.toString();
     }

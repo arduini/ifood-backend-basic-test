@@ -4,7 +4,6 @@ import com.ifood.exceptions.WeatherCityNotFoundException;
 import com.ifood.services.WeatherService;
 import com.ifood.vos.GenericResponseVO;
 import com.ifood.vos.WeatherVO;
-import com.ifood.vos.OpenWeatherMapWeatherVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

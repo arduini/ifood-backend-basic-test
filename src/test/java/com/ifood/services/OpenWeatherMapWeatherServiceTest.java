@@ -59,7 +59,7 @@ public class OpenWeatherMapWeatherServiceTest {
 
         weatherService.getWeather("city");
 
-        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class));
+//        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class));
     }
 
     @Test(expected = WeatherCityNotFoundException.class)
@@ -70,7 +70,7 @@ public class OpenWeatherMapWeatherServiceTest {
 
         weatherService.getWeather("city");
 
-        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class));
+//        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class));
     }
 
     @Test(expected = HttpClientErrorException.class)
@@ -81,7 +81,7 @@ public class OpenWeatherMapWeatherServiceTest {
 
         weatherService.getWeather("city");
 
-        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class));
+//        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class));
     }
 
     @Test(expected = Exception.class)
@@ -92,6 +92,6 @@ public class OpenWeatherMapWeatherServiceTest {
 
         weatherService.getWeather("city");
 
-        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class));
+//        verify(restTemplate, times(1)).exchange(anyString(), eq(HttpMethod.GET), any(), eq(OpenWeatherMapWeatherVO.class));
     }
 }

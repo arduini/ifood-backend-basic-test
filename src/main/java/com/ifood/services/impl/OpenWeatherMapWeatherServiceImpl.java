@@ -18,10 +18,17 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.math.RoundingMode;
+
+import static com.ifood.utils.ConversionsUtil.convertKelvinToCelsius;
+import static com.ifood.utils.ConversionsUtil.convertSecondsToDate;
+
 @Service("OpenWeatherMapWeather")
 public class OpenWeatherMapWeatherServiceImpl implements WeatherService {
 
     private final Logger logger = LoggerFactory.getLogger(OpenWeatherMapWeatherServiceImpl.class);
+
+    private final static String WEATHER_SOURCE = "OpenWeatherMap";
 
     @Autowired
     private RestTemplate restTemplate;
@@ -37,7 +44,7 @@ public class OpenWeatherMapWeatherServiceImpl implements WeatherService {
     private String baseUrl;
 
     @Cacheable(value = "weatherByCity", key = "#city")
-    @HystrixCommand(fallbackMethod = "getWeather_Fallback", ignoreExceptions = { WeatherCityNotFoundException.class })
+    @HystrixCommand(fallbackMethod = "getWeatherFallback", ignoreExceptions = { WeatherCityNotFoundException.class })
     public WeatherVO getWeather(String city) {
 
         logger.info("I=Pesquisando clima por cidade, city={}", city);
@@ -60,7 +67,7 @@ public class OpenWeatherMapWeatherServiceImpl implements WeatherService {
             OpenWeatherMapWeatherVO weatherResponse = response.getBody();
 
             logger.info("I=Clima da cidade encontrado, city={}, weather={}", city, weatherResponse);
-            return new WeatherVO(weatherResponse);
+            return translateToGenericWeatherVO(weatherResponse);
         }
         catch (HttpClientErrorException e) {
 
@@ -81,10 +88,17 @@ public class OpenWeatherMapWeatherServiceImpl implements WeatherService {
     }
 
     @SuppressWarnings("unused")
-    private WeatherVO getWeather_Fallback(String city) {
+    private WeatherVO getWeatherFallback(String city) {
 
         logger.error("E=Fallback - Erro ao pesquisar clima por cidade, city={}", city);
-        return accuWeatherService.getWeather(city);
+
+        try {
+            return accuWeatherService.getWeather(city);
+        }
+        catch (Exception e){
+            logger.error("E=Problemas ao pesquisar clima por cidade no fallback, city={}", city, e);
+            return null;
+        }
     }
 
     private HttpEntity<?> createDefaultHttpEntity() {
@@ -92,5 +106,43 @@ public class OpenWeatherMapWeatherServiceImpl implements WeatherService {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
         return new HttpEntity<>(headers);
+    }
+
+
+    private WeatherVO translateToGenericWeatherVO(OpenWeatherMapWeatherVO openWeatherVO) {
+
+        if(openWeatherVO == null) {
+
+            return null;
+        }
+
+        WeatherVO weatherVO = new WeatherVO();
+
+        weatherVO.setCityId(openWeatherVO.getId());
+        weatherVO.setCityName(openWeatherVO.getName());
+
+        if (openWeatherVO.getWeather() != null && openWeatherVO.getWeather().size() > 0) {
+
+            weatherVO.setMain(openWeatherVO.getWeather().get(0).getMain());
+            weatherVO.setDescription(openWeatherVO.getWeather().get(0).getDescription());
+        }
+
+        if (openWeatherVO.getMain() != null) {
+
+            weatherVO.setTemperature(convertKelvinToCelsius(openWeatherVO.getMain().getTemp()).setScale(2, RoundingMode.FLOOR));
+            weatherVO.setMaxTemp(convertKelvinToCelsius(openWeatherVO.getMain().getTempMax()).setScale(2, RoundingMode.FLOOR));
+            weatherVO.setMinTemp(convertKelvinToCelsius(openWeatherVO.getMain().getTempMin()).setScale(2, RoundingMode.FLOOR));
+            weatherVO.setHumidity(openWeatherVO.getMain().getHumidity());
+        }
+
+        if (openWeatherVO.getSys() != null) {
+
+            weatherVO.setSunrise(convertSecondsToDate(openWeatherVO.getSys().getSunrise()));
+            weatherVO.setSunset(convertSecondsToDate(openWeatherVO.getSys().getSunset()));
+        }
+
+        weatherVO.setSource(WEATHER_SOURCE);
+
+        return weatherVO;
     }
 }
