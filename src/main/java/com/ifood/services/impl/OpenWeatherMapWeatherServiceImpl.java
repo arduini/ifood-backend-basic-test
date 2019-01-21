@@ -1,5 +1,8 @@
 package com.ifood.services.impl;
 
+import static com.ifood.utils.ConversionsUtil.convertKelvinToCelsius;
+import static com.ifood.utils.ConversionsUtil.convertSecondsToDate;
+
 import com.ifood.exceptions.WeatherCityNotFoundException;
 import com.ifood.services.WeatherService;
 import com.ifood.vos.OpenWeatherMapWeatherVO;
@@ -11,7 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -19,9 +26,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.RoundingMode;
-
-import static com.ifood.utils.ConversionsUtil.convertKelvinToCelsius;
-import static com.ifood.utils.ConversionsUtil.convertSecondsToDate;
+import java.util.Optional;
 
 @Service("OpenWeatherMapWeather")
 public class OpenWeatherMapWeatherServiceImpl implements WeatherService {
@@ -45,7 +50,7 @@ public class OpenWeatherMapWeatherServiceImpl implements WeatherService {
 
     @Cacheable(value = "weatherByCity", key = "#city")
     @HystrixCommand(fallbackMethod = "getWeatherFallback", ignoreExceptions = { WeatherCityNotFoundException.class })
-    public WeatherVO getWeather(String city) {
+    public Optional<WeatherVO> getWeather(String city) {
 
         logger.info("I=Pesquisando clima por cidade, city={}", city);
         UriComponents uri = UriComponentsBuilder.fromHttpUrl(baseUrl + "?q={city}&APPID={appId}")
@@ -67,7 +72,7 @@ public class OpenWeatherMapWeatherServiceImpl implements WeatherService {
             OpenWeatherMapWeatherVO weatherResponse = response.getBody();
 
             logger.info("I=Clima da cidade encontrado, city={}, weather={}", city, weatherResponse);
-            return translateToGenericWeatherVO(weatherResponse);
+            return Optional.ofNullable(translateToGenericWeatherVO(weatherResponse));
         }
         catch (HttpClientErrorException e) {
 
@@ -88,7 +93,7 @@ public class OpenWeatherMapWeatherServiceImpl implements WeatherService {
     }
 
     @SuppressWarnings("unused")
-    private WeatherVO getWeatherFallback(String city) {
+    private Optional<WeatherVO> getWeatherFallback(String city) {
 
         logger.error("E=Fallback - Erro ao pesquisar clima por cidade, city={}", city);
 
@@ -97,7 +102,7 @@ public class OpenWeatherMapWeatherServiceImpl implements WeatherService {
         }
         catch (Exception e){
             logger.error("E=Problemas ao pesquisar clima por cidade no fallback, city={}", city, e);
-            return null;
+            return Optional.empty();
         }
     }
 

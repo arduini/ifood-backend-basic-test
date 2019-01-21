@@ -2,7 +2,9 @@ package com.ifood.services;
 
 import com.ifood.vos.WeatherVO;
 
+import java.util.Optional;
+
 public interface WeatherService {
 
-    WeatherVO getWeather(String city);
+    Optional<WeatherVO> getWeather(String city);
 }

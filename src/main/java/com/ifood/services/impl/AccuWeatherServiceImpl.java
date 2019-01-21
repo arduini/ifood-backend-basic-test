@@ -20,6 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service("AccuWeather")
 public class AccuWeatherServiceImpl implements WeatherService {
@@ -38,7 +39,7 @@ public class AccuWeatherServiceImpl implements WeatherService {
     private String baseUrl;
 
     @Cacheable(value = "accuWeatherByCity", key = "#city")
-    public WeatherVO getWeather(String city) {
+    public Optional<WeatherVO> getWeather(String city) {
 
         Long locationKey = getLocationKeyByCityName(city);
 
@@ -67,7 +68,7 @@ public class AccuWeatherServiceImpl implements WeatherService {
             }
 
             logger.info("I=Clima da cidade encontrado, city={}, weather={}", city, weatherResponse);
-            return translateToGenericWeatherVO(weatherResponse.get(0));
+            return Optional.ofNullable(translateToGenericWeatherVO(weatherResponse.get(0)));
         }
         catch (HttpClientErrorException e) {
 
